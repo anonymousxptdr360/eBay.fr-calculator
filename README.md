@@ -10,8 +10,8 @@ You don't need to install anything. You have two simple options:
 👉 **[Click here to use the Calculator](https://stopbordo.odoo.com/calculateur-ebay)**
 
 **Option 2: Use Offline**
-Simply download the `index.html` file from this repository and open it in your web browser.
-[Download index.html here](index.html)
+Simply download the `Calculateur.eBay.html` file from this repository and open it in your web browser.
+[Download here](https://github.com/anonymousxptdr360/eBay.fr-calculator/releases/tag/1.0)
 
 ---
 
@@ -45,8 +45,8 @@ Pas besoin d'installation complexe. Vous avez deux options simples :
 👉 **[Cliquez ici pour utiliser le calculateur](https://stopbordo.odoo.com/calculateur-ebay)**
 
 **Option 2 : Utiliser hors ligne**
-Téléchargez simplement le fichier `index.html` présent dans ce dépôt et ouvrez-le avec votre navigateur internet.
-[Télécharger index.html ici](index.html)
+Téléchargez simplement le fichier `Calculateur.eBay.html` présent dans ce dépôt et ouvrez-le avec votre navigateur internet.
+[Télécharge ici](https://github.com/anonymousxptdr360/eBay.fr-calculator/releases/tag/1.0)
 
 ---
 
