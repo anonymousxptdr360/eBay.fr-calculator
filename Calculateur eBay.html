@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur de Frais eBay.fr (Complet)</title>
+    <!-- Chargement de Tailwind CSS pour le style -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chargement de la police Inter depuis Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Appliquer la police Inter à tout le corps du document */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style pour les placeholders des champs de saisie */
+        ::placeholder {
+            color: #9ca3af;
+        }
+        /* Style pour améliorer l'apparence des champs numériques */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        /* Animation pour le changement d'onglets */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-12 px-4">
+
+    <div class="w-full max-w-lg mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        
+        <!-- En-tête -->
+        <div class="bg-indigo-600 p-6 text-center">
+            <h1 class="text-2xl font-bold text-white">Calculateur eBay.fr</h1>
+            <p class="text-indigo-200 text-sm mt-1">Outil d'aide à la vente</p>
+        </div>
+
+        <!-- Onglets de navigation -->
+        <div class="flex border-b border-gray-200">
+            <button id="tab-calculate-gains" class="flex-1 py-4 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 focus:outline-none transition-colors duration-200">
+                Calculer mes gains
+            </button>
+            <button id="tab-calculate-price" class="flex-1 py-4 text-center font-medium text-gray-500 hover:text-indigo-500 focus:outline-none transition-colors duration-200">
+                Définir mon prix
+            </button>
+        </div>
+
+        <div class="p-8">
+            
+            <!-- MODE 1: CALCUL DES GAINS (Classique) -->
+            <div id="mode-gains" class="fade-in">
+                <p class="text-gray-600 mb-6 text-sm">Entrez votre prix de vente pour voir ce qu'il vous restera réellement.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="item-price" class="text-sm font-medium text-gray-700">Prix de l'article</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <span class="text-gray-500 sm:text-sm">€</span>
+                            </div>
+                            <input type="number" id="item-price" placeholder="20.00" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="shipping-price" class="text-sm font-medium text-gray-700">Frais de livraison (payés par l'acheteur)</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <span class="text-gray-500 sm:text-sm">€</span>
+                            </div>
+                            <input type="number" id="shipping-price" placeholder="2.99" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+                        </div>
+                    </div>
+
+                    <button id="btn-calc-gains" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition duration-150 ease-in-out text-lg mt-2">
+                        Calculer mes gains
+                    </button>
+                </div>
+
+                <!-- Résultats Mode 1 -->
+                <div id="results-gains" class="hidden mt-6 pt-6 border-t border-gray-200 space-y-4">
+                    <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center">
+                        <span class="text-gray-600 font-medium">Prix payé par l'acheteur :</span>
+                        <span id="res-total-sale" class="font-bold text-gray-800"></span>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded-lg border border-red-100 space-y-2">
+                        <div class="flex justify-between text-sm text-red-600">
+                            <span>Commissions eBay (10,42% + 0,35€) :</span>
+                            <span id="res-total-fees"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200 flex justify-between items-center">
+                        <span class="font-bold text-green-800 text-lg">CE QU'IL VOUS RESTE :</span>
+                        <span id="res-net-income" class="font-extrabold text-2xl text-green-700"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODE 2: DÉFINIR MON PRIX (Inversé) -->
+            <div id="mode-price" class="hidden fade-in">
+                <p class="text-gray-600 mb-6 text-sm">Combien voulez-vous avoir dans votre poche ? Nous calculerons le prix à afficher.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="target-net" class="text-sm font-medium text-gray-700">Somme voulue (Net dans la poche)</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <span class="text-green-600 sm:text-sm font-bold">€</span>
+                            </div>
+                            <input type="number" id="target-net" placeholder="20.00" class="w-full pl-8 pr-4 py-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500 text-lg ring-1 ring-green-100">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="target-shipping" class="text-sm font-medium text-gray-700">Frais de livraison prévus</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <span class="text-gray-500 sm:text-sm">€</span>
+                            </div>
+                            <input type="number" id="target-shipping" placeholder="2.99" class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+                        </div>
+                    </div>
+
+                    <button id="btn-calc-price" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out text-lg mt-2">
+                        Trouver mon prix de vente
+                    </button>
+                </div>
+
+                <!-- Résultats Mode 2 -->
+                <div id="results-price" class="hidden mt-6 pt-6 border-t border-gray-200 space-y-4">
+                    <div class="bg-indigo-50 p-5 rounded-lg border border-indigo-200 text-center">
+                        <span class="block text-indigo-800 font-medium mb-1">Prix de l'article à afficher :</span>
+                        <span id="res-suggested-price" class="font-extrabold text-3xl text-indigo-700"></span>
+                    </div>
+
+                    <div class="bg-gray-50 p-4 rounded-lg text-sm text-gray-600 space-y-1">
+                        <p class="flex justify-between"><span>Prix Article :</span> <span id="proof-item" class="font-medium"></span></p>
+                        <p class="flex justify-between"><span>+ Livraison :</span> <span id="proof-shipping" class="font-medium"></span></p>
+                        <div class="border-t border-gray-200 my-1"></div>
+                        <p class="flex justify-between text-gray-800"><span>= Total payé par l'acheteur :</span> <span id="proof-total" class="font-bold"></span></p>
+                        <p class="flex justify-between text-red-500"><span>- Frais eBay :</span> <span id="proof-fees"></span></p>
+                        <div class="border-t border-gray-200 my-1"></div>
+                        <p class="flex justify-between text-green-700 font-bold text-base"><span>= Votre gain net :</span> <span id="proof-net"></span></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTES ---
+        const EBAY_VARIABLE_RATE = 0.1042; // 10% + 0.42%
+        const EBAY_FIXED_FEE = 0.35;
+
+        // --- DOM ELEMENTS ---
+        // Tabs
+        const tabGains = document.getElementById('tab-calculate-gains');
+        const tabPrice = document.getElementById('tab-calculate-price');
+        const modeGains = document.getElementById('mode-gains');
+        const modePrice = document.getElementById('mode-price');
+
+        // Mode 1 Elements
+        const itemPriceIn = document.getElementById('item-price');
+        const shipPriceIn = document.getElementById('shipping-price');
+        const btnCalcGains = document.getElementById('btn-calc-gains');
+        const resGainsDiv = document.getElementById('results-gains');
+        const resTotalSale = document.getElementById('res-total-sale');
+        const resTotalFees = document.getElementById('res-total-fees');
+        const resNetIncome = document.getElementById('res-net-income');
+
+        // Mode 2 Elements
+        const targetNetIn = document.getElementById('target-net');
+        const targetShipIn = document.getElementById('target-shipping');
+        const btnCalcPrice = document.getElementById('btn-calc-price');
+        const resPriceDiv = document.getElementById('results-price');
+        const resSuggestedPrice = document.getElementById('res-suggested-price');
+        // Proof elements
+        const proofItem = document.getElementById('proof-item');
+        const proofShipping = document.getElementById('proof-shipping');
+        const proofTotal = document.getElementById('proof-total');
+        const proofFees = document.getElementById('proof-fees');
+        const proofNet = document.getElementById('proof-net');
+
+        // --- GESTION DES ONGLETS ---
+        function switchTab(mode) {
+            if (mode === 'gains') {
+                // UI Styles
+                tabGains.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-semibold');
+                tabGains.classList.remove('text-gray-500', 'border-b-0', 'font-medium');
+                
+                tabPrice.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-semibold');
+                tabPrice.classList.add('text-gray-500', 'border-b-0', 'font-medium');
+
+                // Visibility
+                modeGains.classList.remove('hidden');
+                modePrice.classList.add('hidden');
+            } else {
+                // UI Styles
+                tabPrice.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-semibold');
+                tabPrice.classList.remove('text-gray-500', 'border-b-0', 'font-medium');
+
+                tabGains.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-semibold');
+                tabGains.classList.add('text-gray-500', 'border-b-0', 'font-medium');
+
+                // Visibility
+                modePrice.classList.remove('hidden');
+                modeGains.classList.add('hidden');
+            }
+        }
+
+        tabGains.addEventListener('click', () => switchTab('gains'));
+        tabPrice.addEventListener('click', () => switchTab('price'));
+
+        // --- UTILITAIRES ---
+        function formatEUR(num) {
+            return num.toFixed(2).replace('.', ',') + ' €';
+        }
+
+        // --- LOGIQUE MODE 1 (GAINS) ---
+        function calculateGains() {
+            const price = parseFloat(itemPriceIn.value) || 0;
+            const ship = parseFloat(shipPriceIn.value) || 0;
+            
+            if (price <= 0 && ship <= 0) return;
+
+            const totalSale = price + ship;
+            const fees = (totalSale * EBAY_VARIABLE_RATE) + EBAY_FIXED_FEE;
+            const net = totalSale - fees;
+
+            resTotalSale.textContent = formatEUR(totalSale);
+            resTotalFees.textContent = "- " + formatEUR(fees);
+            resNetIncome.textContent = formatEUR(net);
+            
+            resGainsDiv.classList.remove('hidden');
+        }
+
+        // --- LOGIQUE MODE 2 (PRIX À FIXER) ---
+        function calculateRequiredPrice() {
+            const target = parseFloat(targetNetIn.value) || 0;
+            const ship = parseFloat(targetShipIn.value) || 0;
+
+            if (target <= 0) return;
+
+            // Formule inversée :
+            // Net = (TotalVente * (1 - Taux)) - Fixe
+            // Net + Fixe = TotalVente * (1 - Taux)
+            // TotalVente = (Net + Fixe) / (1 - Taux)
+            
+            const totalSaleRequired = (target + EBAY_FIXED_FEE) / (1 - EBAY_VARIABLE_RATE);
+            
+            // Prix Article = TotalVente - Livraison
+            const itemPriceRequired = totalSaleRequired - ship;
+
+            // Affichage
+            resSuggestedPrice.textContent = formatEUR(itemPriceRequired);
+
+            // Preuve du calcul (Vérification)
+            // On recalcule les frais réels basés sur ce nouveau prix pour montrer à l'utilisateur que ça tombe juste
+            const verifTotal = itemPriceRequired + ship;
+            const verifFees = (verifTotal * EBAY_VARIABLE_RATE) + EBAY_FIXED_FEE;
+            const verifNet = verifTotal - verifFees;
+
+            proofItem.textContent = formatEUR(itemPriceRequired);
+            proofShipping.textContent = "+ " + formatEUR(ship);
+            proofTotal.textContent = formatEUR(verifTotal);
+            proofFees.textContent = "- " + formatEUR(verifFees);
+            proofNet.textContent = formatEUR(verifNet); // Devrait être très proche du target
+
+            resPriceDiv.classList.remove('hidden');
+        }
+
+        // --- EVENTS ---
+        btnCalcGains.addEventListener('click', calculateGains);
+        btnCalcPrice.addEventListener('click', calculateRequiredPrice);
+
+        // Enter key support
+        [itemPriceIn, shipPriceIn].forEach(el => {
+            el.addEventListener('keypress', (e) => { if(e.key === 'Enter') calculateGains(); });
+        });
+        [targetNetIn, targetShipIn].forEach(el => {
+            el.addEventListener('keypress', (e) => { if(e.key === 'Enter') calculateRequiredPrice(); });
+        });
+
+    </script>
+</body>
+</html>
